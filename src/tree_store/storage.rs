@@ -164,7 +164,8 @@ impl Storage {
                 table_root: None,
                 table_type: TableType::Normal,
             };
-            let (new_root, _) = make_mut_single_leaf(FREED_TABLE, &freed_table.to_bytes(), &mem)?;
+            let (new_root, _) =
+                make_mut_single_leaf::<[u8]>(FREED_TABLE, &freed_table.to_bytes(), &mem)?;
             mem.set_secondary_root_page(new_root)?;
             mem.commit(next_transaction_id)?;
             next_transaction_id += 1;
@@ -311,7 +312,7 @@ impl Storage {
                 .extend_from_slice(&freed);
             Ok(new_root)
         } else {
-            let (new_root, _) = make_mut_single_leaf(key, value, &self.mem)?;
+            let (new_root, _) = make_mut_single_leaf::<K>(key, value, &self.mem)?;
             Ok(new_root)
         }
     }
@@ -334,7 +335,7 @@ impl Storage {
                 .extend_from_slice(&freed);
             (new_root, guard)
         } else {
-            make_mut_single_leaf(key, &value, &self.mem)?
+            make_mut_single_leaf::<K>(key, &value, &self.mem)?
         };
         Ok((new_root, guard))
     }

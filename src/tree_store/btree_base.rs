@@ -280,17 +280,28 @@ impl<'a: 'b, 'b> LeafBuilder<'a, 'b> {
         ) as usize
     }
 
-    pub(in crate::tree_store) fn append(&mut self, key: &[u8], value: &[u8]) {
-        let key_offset = if self.pairs_written == 0 {
+    fn key_start(&self, n: usize) -> usize {
+        if n == 0 {
             4 + 2 * size_of::<u32>() * self.num_pairs
         } else {
-            self.key_end(self.pairs_written - 1)
-        };
+            self.key_end(n - 1)
+        }
+    }
+
+    pub(in crate::tree_store) fn append<K: RedbKey + ?Sized>(&mut self, key: &[u8], value: &[u8]) {
+        let key_offset = self.key_start(self.pairs_written);
         let value_offset = if self.pairs_written == 0 {
             4 + 2 * size_of::<u32>() * self.num_pairs + self.provisioned_key_bytes
         } else {
             self.value_end(self.pairs_written - 1)
         };
+
+        if self.pairs_written > 0 {
+            let prev_start = self.key_start(self.pairs_written - 1);
+            let prev_end = self.key_end(self.pairs_written - 1);
+            let prev = &self.page.memory()[prev_start..prev_end];
+            assert!(K::compare(prev, key).is_lt());
+        }
 
         let n = self.pairs_written;
         let offset = 4 + size_of::<u32>() * self.num_pairs + size_of::<u32>() * n;
