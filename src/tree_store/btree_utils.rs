@@ -391,8 +391,10 @@ fn repair_children<K: RedbKey + ?Sized>(
                 let offset = if i > 0 { i - 1 } else { i + 1 };
                 if let Some(PartialLeaf(partials)) = children.get(offset) {
                     if let Some(new_page) = merge_leaf::<K>(*handle, partials, freed, manager)? {
+                        dbg!("MERGED!");
                         result.push(new_page);
                     } else {
+                        dbg!("SPLIT!");
                         let (page1, page2) = split_leaf::<K>(*handle, partials, manager, freed)?;
                         result.push(page1);
                         result.push(page2);
