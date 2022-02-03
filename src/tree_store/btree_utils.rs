@@ -231,9 +231,9 @@ fn merge_leaf<K: RedbKey + ?Sized>(
 
     let page = manager.get_page(leaf);
     let accessor = LeafAccessor::new(&page);
-    if accessor.num_pairs() + partial.len() > BTREE_ORDER {
-        return Ok(None);
-    }
+    // if accessor.num_pairs() + partial.len() > BTREE_ORDER {
+    //     return Ok(None);
+    // }
 
     let old_size = accessor.length_of_pairs(0, accessor.num_pairs());
     let new_size = old_size
