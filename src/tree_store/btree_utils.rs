@@ -404,6 +404,7 @@ fn repair_children<K: RedbKey + ?Sized>(
                 }
             }
         }
+        assert!(repaired);
         Ok(result)
     } else if children.iter().any(|x| matches!(x, PartialInternal(_))) {
         let mut result = vec![];
