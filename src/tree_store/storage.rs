@@ -16,6 +16,7 @@ use std::borrow::Borrow;
 use std::cmp::{max, min};
 use std::collections::{BTreeSet, Bound};
 use std::convert::TryInto;
+use std::fmt::{self, Display, Formatter};
 use std::mem::size_of;
 use std::ops::{RangeBounds, RangeFull, RangeTo};
 use std::panic;
@@ -77,6 +78,26 @@ impl DbStats {
     /// Number of bytes consumed by fragmentation
     pub fn fragmented_bytes(&self) -> usize {
         self.fragmented_bytes
+    }
+}
+
+impl Display for DbStats {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let Self {
+            fragmented_bytes,
+            free_pages,
+            overhead_bytes,
+            stored_leaf_bytes,
+            tree_height,
+        } = self;
+
+        writeln!(f, "fragmented bytes: {fragmented_bytes}")?;
+        writeln!(f, "free pages: {free_pages}")?;
+        writeln!(f, "overhead bytes: {overhead_bytes}")?;
+        writeln!(f, "stored leaf bytes: {stored_leaf_bytes}")?;
+        writeln!(f, "tree height: {tree_height}")?;
+
+        Ok(())
     }
 }
 
